@@ -14,18 +14,21 @@ public class Main {
     private static final Logger logger = LogManager.getLogger(Main.class);
 
     public static void main(String[] args) {
-        try (ExecutorService executorService = Executors.newFixedThreadPool(5)) {
-            List<Callable<String>> callables = new ArrayList<>();
-            for (int i = 0; i < 20; i++) {
-                callables.add(new MyThread());
-            }
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        List<Callable<String>> callables = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            callables.add(new MyThread());
+        }
 
+        try {
             List<Future<String>> futures = executorService.invokeAll(callables);
             for (int i = 0; i < 20; i++) {
                 logger.info(futures.get(i).get());
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
+        } finally {
+            executorService.shutdown();
         }
     }
 }
